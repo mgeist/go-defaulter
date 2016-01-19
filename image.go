@@ -1,15 +1,14 @@
 package main
 
 import (
-  "fmt"
-  "github.com/golang/freetype"
-  "github.com/golang/freetype/truetype"
-  "image"
-  "image/color"
-  "image/draw"
-  "io/ioutil"
-  "math/rand"
-
+	"fmt"
+	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
+	"image"
+	"image/color"
+	"image/draw"
+	"io/ioutil"
+	"math/rand"
 )
 
 var font *truetype.Font
@@ -37,7 +36,7 @@ func initFont() {
 }
 
 func generateImage(size int, seed int64, text string) image.Image {
-  fontSize := float64(size / 2)
+	fontSize := float64(size / 2)
 
 	img := image.NewRGBA(image.Rect(0, 0, size, size))
 
@@ -64,5 +63,5 @@ func generateImage(size int, seed int64, text string) image.Image {
 		fmt.Println(err)
 	}
 
-  return img
+	return img
 }
