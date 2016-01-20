@@ -39,7 +39,7 @@ func parseParams(urlParams url.Values) Params {
 		text = "?"
 	}
 
-	if len(text) > 2 {
+	if len([]rune(text)) > 2 {
 		text = text[:2]
 	}
 
@@ -70,12 +70,15 @@ func parseParams(urlParams url.Values) Params {
 	return params
 }
 
-func getPort() string {
+func getAddr() string {
 	port := os.Getenv("PORT")
+	var addr string
 	if len(port) == 0 {
-		port = "8080"
+		addr = "127.0.0.1:8080"
+	} else {
+		addr = ":" + port
 	}
-	return port
+	return addr
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -111,5 +114,5 @@ func main() {
 
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/test", testHandler)
-	http.ListenAndServe(":"+getPort(), nil)
+	http.ListenAndServe(getAddr(), nil)
 }

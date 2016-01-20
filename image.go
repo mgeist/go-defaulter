@@ -13,6 +13,7 @@ import (
 )
 
 var font *truetype.Font
+var cjkFont *truetype.Font
 var colors = []color.RGBA{
 	{191, 210, 215, 255},
 	{87, 130, 139, 255},
@@ -30,7 +31,17 @@ func initFont() {
 		fmt.Println(err)
 	}
 
+	cjkFontBytes, err := ioutil.ReadFile("./wqy-zenhei.ttc")
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	font, err = freetype.ParseFont(fontBytes)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	cjkFont, err = freetype.ParseFont(cjkFontBytes)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -46,6 +57,14 @@ func hexToRGB(hexString string) color.RGBA {
 }
 
 func generateImage(params Params) image.Image {
+	var detectedFont *truetype.Font
+
+	if []rune(params.text)[0] > '\u2E7F' {
+		detectedFont = cjkFont
+	} else {
+		detectedFont = font
+	}
+
 	fontSize := float64(params.size / 2)
 
 	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
@@ -64,7 +83,7 @@ func generateImage(params Params) image.Image {
 
 	c := freetype.NewContext()
 	c.SetDPI(72)
-	c.SetFont(font)
+	c.SetFont(detectedFont)
 	c.SetFontSize(fontSize)
 	c.SetClip(img.Bounds())
 	c.SetDst(img)
