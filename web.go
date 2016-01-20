@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"image/color"
 	"image/png"
 	"math"
 	"net/http"
@@ -13,10 +14,18 @@ import (
 
 var templates = template.Must(template.ParseFiles("test.html"))
 
-func parseParams(params url.Values) (int, int64, string) {
-	sizeString := params.Get("size")
-	seedString := params.Get("seed")
-	text := params.Get("text")
+type Params struct {
+	size  int
+	seed  int64
+	text  string
+	color color.RGBA
+}
+
+func parseParams(urlParams url.Values) Params {
+	sizeString := urlParams.Get("size")
+	seedString := urlParams.Get("seed")
+	text := urlParams.Get("text")
+	hex := urlParams.Get("hex")
 
 	if len(sizeString) == 0 {
 		sizeString = "200"
@@ -46,7 +55,19 @@ func parseParams(params url.Values) (int, int64, string) {
 		fmt.Println(err)
 	}
 
-	return size, int64(seed), text
+	var color color.RGBA
+	if len(hex) != 0 {
+		color = hexToRGB(hex)
+	}
+
+	params := Params{
+		size:  size,
+		seed:  int64(seed),
+		text:  text,
+		color: color,
+	}
+
+	return params
 }
 
 func getPort() string {
@@ -58,8 +79,8 @@ func getPort() string {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	size, seed, text := parseParams(r.URL.Query())
-	png.Encode(w, generateImage(size, seed, text))
+	params := parseParams(r.URL.Query())
+	png.Encode(w, generateImage(params))
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
