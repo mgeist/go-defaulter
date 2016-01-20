@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
@@ -35,16 +36,31 @@ func initFont() {
 	}
 }
 
-func generateImage(size int, seed int64, text string) image.Image {
-	fontSize := float64(size / 2)
-
-	img := image.NewRGBA(image.Rect(0, 0, size, size))
-
-	if seed != 0 {
-		rand.Seed(seed)
+func hexToRGB(hexString string) color.RGBA {
+	// TODO: strip #, allow 3-value hex colors
+	values, err := hex.DecodeString(hexString)
+	if err != nil {
+		fmt.Println(err)
 	}
-	randColor := colors[rand.Intn(len(colors))]
-	draw.Draw(img, img.Bounds(), &image.Uniform{randColor}, image.ZP, draw.Src)
+	return color.RGBA{values[0], values[1], values[2], 255}
+}
+
+func generateImage(params Params) image.Image {
+	fontSize := float64(params.size / 2)
+
+	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
+
+	if params.seed != 0 {
+		rand.Seed(params.seed)
+	}
+
+	var bgColor color.RGBA
+	if params.color == (color.RGBA{}) {
+		bgColor = colors[rand.Intn(len(colors))]
+	} else {
+		bgColor = params.color
+	}
+	draw.Draw(img, img.Bounds(), &image.Uniform{bgColor}, image.ZP, draw.Src)
 
 	c := freetype.NewContext()
 	c.SetDPI(72)
@@ -56,9 +72,9 @@ func generateImage(size int, seed int64, text string) image.Image {
 
 	fontWidth := (font.Bounds(c.PointToFixed(fontSize) >> 6)).Max.X
 
-	i := int(float64(size) - (0.75 * float64(fontWidth) * float64(len(text))))
+	i := int(float64(params.size) - (0.75 * float64(fontWidth) * float64(len(params.text))))
 	pt := freetype.Pt(i/2, int(fontSize*1.333))
-	_, err := c.DrawString(text, pt)
+	_, err := c.DrawString(params.text, pt)
 	if err != nil {
 		fmt.Println(err)
 	}
