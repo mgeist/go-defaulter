@@ -1,0 +1,32 @@
+<html>
+  {{ range .Sizes }}
+    <img src="/?text=AB&size={{.}}">
+    <img src="/?text=字&size={{.}}">
+    <img src="/?text=FFF&size={{.}}&hex=FF0000">
+  {{ end }}
+  <hr>
+  {{ range .Sizes }}
+    <img src="/pie/?progress=33&color=yellow&size={{.}}">
+  {{ end }}
+  <hr>
+  {{ range .Ranges }}
+    <img src="/pie/?progress={{.}}&size=40">
+    <img src="/pie/?progress={{.}}&color=red&size=40">
+    <img src="/pie/?progress={{.}}&color=yellow&size=40">
+  {{ end }}
+  <hr>
+  {{ range .Sizes }}
+    <img src="/horseshoe/?progress=66&size={{.}}">
+  {{ end }}
+  <hr>
+  {{ range .Ranges }}
+    <img src="/horseshoe/?progress={{.}}&size=40">
+    <img src="/horseshoe/?progress={{.}}&color=red&size=40">
+    <img src="/horseshoe/?progress={{.}}&color=yellow&size=40">
+  {{ end }}
+  <hr>
+  <div style="background-color: green;">
+    <img src="/circularize/?src=http://igrudge.net/wp-content/uploads/2013/04/Crystal_Tux.png">
+    <img src="/circularize/?src=https://img13.deviantart.net/5bb7/i/2006/097/7/a/linux_tux_g1_by_kr3_w.jpg">
+  </div>
+</html>
