@@ -114,5 +114,7 @@ func main() {
 
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/test", testHandler)
+	// TODO: set proper content headers instead of this
+	http.HandleFunc("/favicon.ico", http.NotFound)
 	http.ListenAndServe(getAddr(), nil)
 }
