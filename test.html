@@ -6,6 +6,12 @@
   {{ end }}
   <hr>
   {{ range .Sizes }}
+    <img src="/?text=AB&size={{.}}&border=true">
+    <img src="/?text=字&size={{.}}&border=true">
+    <img src="/?text=FFF&size={{.}}&hex=FF0000&border=true">
+  {{ end }}
+  <hr>
+  {{ range .Sizes }}
     <img src="/pie/?progress=33&color=yellow&size={{.}}">
   {{ end }}
   <hr>
