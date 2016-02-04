@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/golang/freetype"
-	"github.com/golang/freetype/truetype"
+	"github.com/mgeist/freetype"
+	"github.com/mgeist/freetype/truetype"
+	"golang.org/x/image/font"
+	"golang.org/x/image/math/fixed"
 	"image"
 	"image/color"
 	"image/draw"
@@ -12,7 +14,8 @@ import (
 	"math/rand"
 )
 
-var font *truetype.Font
+var defaultFont *truetype.Font
+var cjkFont *truetype.Font
 var colors = []color.RGBA{
 	{191, 210, 215, 255},
 	{87, 130, 139, 255},
@@ -30,7 +33,17 @@ func initFont() {
 		fmt.Println(err)
 	}
 
-	font, err = freetype.ParseFont(fontBytes)
+	cjkFontBytes, err := ioutil.ReadFile("./wqy-zenhei.ttc")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defaultFont, err = freetype.ParseFont(fontBytes)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	cjkFont, err = freetype.ParseFont(cjkFontBytes)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -46,6 +59,14 @@ func hexToRGB(hexString string) color.RGBA {
 }
 
 func generateImage(params Params) image.Image {
+	var detectedFont *truetype.Font
+
+	if []rune(params.text)[0] > '\u2E7F' {
+		detectedFont = cjkFont
+	} else {
+		detectedFont = defaultFont
+	}
+
 	fontSize := float64(params.size / 2)
 
 	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
@@ -62,22 +83,19 @@ func generateImage(params Params) image.Image {
 	}
 	draw.Draw(img, img.Bounds(), &image.Uniform{bgColor}, image.ZP, draw.Src)
 
-	c := freetype.NewContext()
-	c.SetDPI(72)
-	c.SetFont(font)
-	c.SetFontSize(fontSize)
-	c.SetClip(img.Bounds())
-	c.SetDst(img)
-	c.SetSrc(image.White)
-
-	fontWidth := (font.Bounds(c.PointToFixed(fontSize) >> 6)).Max.X
-
-	i := int(float64(params.size) - (0.75 * float64(fontWidth) * float64(len(params.text))))
-	pt := freetype.Pt(i/2, int(fontSize*1.333))
-	_, err := c.DrawString(params.text, pt)
-	if err != nil {
-		fmt.Println(err)
+	d := &font.Drawer{
+		Dst: img,
+		Src: image.White,
+		Face: truetype.NewFace(detectedFont, &truetype.Options{
+			Size: fontSize,
+			DPI:  72,
+		}),
 	}
+	d.Dot = fixed.Point26_6{
+		X: (fixed.I(params.size) - d.MeasureString(params.text)) / 2,
+		Y: fixed.I(int(fontSize * 1.4)),
+	}
+	d.DrawString(params.text)
 
 	return img
 }
