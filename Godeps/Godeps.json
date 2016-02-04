@@ -3,9 +3,9 @@
 	"GoVersion": "go1.5",
 	"Deps": [
 		{
-			"ImportPath": "github.com/golang/freetype",
-			"Comment": "release-120-gf29eb11",
-			"Rev": "f29eb116deb328d02ee5c573f02d442ca67d5532"
+			"ImportPath": "github.com/mgeist/freetype",
+			"Comment": "release-123-g4a15e25",
+			"Rev": "4a15e257c56f1e90f2952f55baff199cdfaf44bb"
 		},
 		{
 			"ImportPath": "golang.org/x/image/font",
