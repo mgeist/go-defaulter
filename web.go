@@ -15,16 +15,18 @@ import (
 var templates = template.Must(template.ParseFiles("test.html"))
 
 type Params struct {
-	size  int
-	seed  int64
-	text  string
-	color color.RGBA
+	size   int
+	seed   int64
+	text   string
+	border bool
+	color  color.RGBA
 }
 
 func parseParams(urlParams url.Values) Params {
 	sizeString := urlParams.Get("size")
 	seedString := urlParams.Get("seed")
 	text := urlParams.Get("text")
+	borderString := urlParams.Get("border")
 	hex := urlParams.Get("hex")
 
 	if len(sizeString) == 0 {
@@ -43,6 +45,10 @@ func parseParams(urlParams url.Values) Params {
 		text = text[:2]
 	}
 
+	if len(borderString) == 0 {
+		borderString = "false"
+	}
+
 	size, err := strconv.Atoi(sizeString)
 	if err != nil {
 		fmt.Println(err)
@@ -55,16 +61,22 @@ func parseParams(urlParams url.Values) Params {
 		fmt.Println(err)
 	}
 
+	border, err := strconv.ParseBool(borderString)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	var color color.RGBA
 	if len(hex) != 0 {
 		color = hexToRGB(hex)
 	}
 
 	params := Params{
-		size:  size,
-		seed:  int64(seed),
-		text:  text,
-		color: color,
+		size:   size,
+		seed:   int64(seed),
+		text:   text,
+		border: border,
+		color:  color,
 	}
 
 	return params
