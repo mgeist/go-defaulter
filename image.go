@@ -119,3 +119,32 @@ func generateImage(params Params) image.Image {
 
 	return img
 }
+
+func generatePie(params PieParams) image.Image {
+	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
+
+	halfWidth := float64(params.size / 2)
+	strokeWidth := math.Floor(halfWidth * 0.1)
+	circleSize := halfWidth * 0.94
+	arcAngle := math.Pi * 2
+
+	gc := draw2dimg.NewGraphicContext(img)
+	gc.BeginPath()
+	gc.SetStrokeColor(params.color)
+	gc.SetFillColor(color.RGBA{255, 255, 255, 255})
+	gc.SetLineWidth(strokeWidth)
+	gc.ArcTo(halfWidth, halfWidth, circleSize, circleSize, arcAngle, arcAngle)
+	gc.Close()
+	gc.FillStroke()
+
+	startAngle := 270 * (math.Pi / 180.0)
+	angle := (360 * (float64(params.progress) * 0.01)) * (math.Pi / 180.0)
+	gc.SetFillColor(params.color)
+	gc.BeginPath()
+	gc.MoveTo(halfWidth, halfWidth)
+	gc.ArcTo(halfWidth, halfWidth, circleSize, circleSize, startAngle, angle)
+	gc.Close()
+	gc.Fill()
+
+	return img
+}

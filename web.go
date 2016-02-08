@@ -14,12 +14,71 @@ import (
 
 var templates = template.Must(template.ParseFiles("test.html"))
 
+var progressColors = map[string]color.RGBA{
+	"green":  color.RGBA{130, 187, 65, 255},
+	"yellow": color.RGBA{243, 228, 110, 255},
+	"red":    color.RGBA{227, 112, 104, 255},
+}
+
 type Params struct {
 	size   int
 	seed   int64
 	text   string
 	border bool
 	color  color.RGBA
+}
+
+type PieParams struct {
+	size     int
+	progress int
+	color    color.RGBA
+}
+
+func parsePieParams(urlParams url.Values) PieParams {
+	sizeString := urlParams.Get("size")
+	progressString := urlParams.Get("progress")
+	colorString := urlParams.Get("color")
+
+	if len(sizeString) == 0 {
+		sizeString = "200"
+	}
+
+	size, err := strconv.Atoi(sizeString)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	size = int(math.Max(math.Min(2048, float64(size)), 1))
+
+	if len(progressString) == 0 {
+		progressString = "0"
+	}
+
+	progress, err := strconv.Atoi(progressString)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	progress = int(math.Max(math.Min(100, float64(progress)), 0))
+
+	if len(colorString) == 0 {
+		colorString = "green"
+	}
+
+	var progressColor color.RGBA
+	if c, ok := progressColors[colorString]; ok {
+		progressColor = c
+	} else {
+		progressColor = progressColors["green"]
+	}
+
+	params := PieParams{
+		size:     size,
+		progress: progress,
+		color:    progressColor,
+	}
+
+	return params
 }
 
 func parseParams(urlParams url.Values) Params {
@@ -98,6 +157,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	png.Encode(w, generateImage(params))
 }
 
+func pieHandler(w http.ResponseWriter, r *http.Request) {
+	params := parsePieParams(r.URL.Query())
+	png.Encode(w, generatePie(params))
+}
+
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	var sizes []int
 	var ranges []int
@@ -125,6 +189,7 @@ func main() {
 	initFont()
 
 	http.HandleFunc("/", handler)
+	http.HandleFunc("/pie/", pieHandler)
 	http.HandleFunc("/test", testHandler)
 	// TODO: set proper content headers instead of this
 	http.HandleFunc("/favicon.ico", http.NotFound)
