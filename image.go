@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/mgeist/draw2d/draw2dimg"
 	"github.com/mgeist/freetype"
 	"github.com/mgeist/freetype/truetype"
 	"golang.org/x/image/font"
@@ -11,6 +12,7 @@ import (
 	"image/color"
 	"image/draw"
 	"io/ioutil"
+	"math"
 	"math/rand"
 )
 
@@ -59,8 +61,9 @@ func hexToRGB(hexString string) color.RGBA {
 }
 
 func generateImage(params Params) image.Image {
-	var detectedFont *truetype.Font
+	fgColor := color.RGBA{255, 255, 255, 255}
 
+	var detectedFont *truetype.Font
 	if []rune(params.text)[0] > '\u2E7F' {
 		detectedFont = cjkFont
 	} else {
@@ -81,11 +84,28 @@ func generateImage(params Params) image.Image {
 	} else {
 		bgColor = params.color
 	}
+
+	if params.border {
+		bgColor, fgColor = fgColor, bgColor
+	}
+
 	draw.Draw(img, img.Bounds(), &image.Uniform{bgColor}, image.ZP, draw.Src)
+
+	if params.border {
+		strokeWidth := fontSize * 0.08
+		circleSize := fontSize * 0.92
+		arcAngle := math.Pi * 2
+
+		gc := draw2dimg.NewGraphicContext(img)
+		gc.SetStrokeColor(fgColor)
+		gc.SetLineWidth(strokeWidth)
+		gc.ArcTo(fontSize, fontSize, circleSize, circleSize, arcAngle, arcAngle)
+		gc.Stroke()
+	}
 
 	d := &font.Drawer{
 		Dst: img,
-		Src: image.White,
+		Src: image.NewUniform(fgColor),
 		Face: truetype.NewFace(detectedFont, &truetype.Options{
 			Size: fontSize,
 			DPI:  72,
@@ -93,7 +113,7 @@ func generateImage(params Params) image.Image {
 	}
 	d.Dot = fixed.Point26_6{
 		X: (fixed.I(params.size) - d.MeasureString(params.text)) / 2,
-		Y: fixed.I(int(fontSize * 1.4)),
+		Y: fixed.I(int(math.Ceil(fontSize * 1.35))),
 	}
 	d.DrawString(params.text)
 

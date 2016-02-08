@@ -3,17 +3,30 @@
 	"GoVersion": "go1.5",
 	"Deps": [
 		{
+			"ImportPath": "github.com/mgeist/draw2d",
+			"Comment": "v1-69-g6f39c4d",
+			"Rev": "6f39c4d2a4b3cffcf3edeb107c172665c8e5dcfe"
+		},
+		{
 			"ImportPath": "github.com/mgeist/freetype",
 			"Comment": "release-123-g4a15e25",
 			"Rev": "4a15e257c56f1e90f2952f55baff199cdfaf44bb"
 		},
 		{
+			"ImportPath": "golang.org/x/image/draw",
+			"Rev": "7c492694a6443a92fd349fda0c4c7b587040f161"
+		},
+		{
 			"ImportPath": "golang.org/x/image/font",
-			"Rev": "baddd3465a05d84a6d8d3507547a91cb188c81ea"
+			"Rev": "7c492694a6443a92fd349fda0c4c7b587040f161"
+		},
+		{
+			"ImportPath": "golang.org/x/image/math/f64",
+			"Rev": "7c492694a6443a92fd349fda0c4c7b587040f161"
 		},
 		{
 			"ImportPath": "golang.org/x/image/math/fixed",
-			"Rev": "baddd3465a05d84a6d8d3507547a91cb188c81ea"
+			"Rev": "7c492694a6443a92fd349fda0c4c7b587040f161"
 		}
 	]
 }
