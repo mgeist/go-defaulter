@@ -18,6 +18,9 @@ import (
 
 var defaultFont *truetype.Font
 var cjkFont *truetype.Font
+
+var white = color.RGBA{255, 255, 255, 255}
+var gray = color.RGBA{247, 246, 245, 255}
 var colors = []color.RGBA{
 	{191, 210, 215, 255},
 	{87, 130, 139, 255},
@@ -61,7 +64,7 @@ func hexToRGB(hexString string) color.RGBA {
 }
 
 func generateImage(params Params) image.Image {
-	fgColor := color.RGBA{255, 255, 255, 255}
+	fgColor := white
 
 	var detectedFont *truetype.Font
 	if []rune(params.text)[0] > '\u2E7F' {
@@ -70,7 +73,7 @@ func generateImage(params Params) image.Image {
 		detectedFont = defaultFont
 	}
 
-	fontSize := float64(params.size / 2)
+	fontSize := float64(params.size) * 0.5
 
 	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
 
@@ -124,15 +127,15 @@ func generatePie(params PieParams) image.Image {
 	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
 
 	progressColor := progressColors[params.color]
-	halfWidth := float64(params.size / 2)
+	halfWidth := float64(params.size) * 0.5
 	strokeWidth := math.Floor(halfWidth * 0.1)
 	circleSize := halfWidth * 0.94
-	arcAngle := math.Pi * 2
+	arcAngle := 6.283185 // 2 * math.Pi
 
 	gc := draw2dimg.NewGraphicContext(img)
 	gc.BeginPath()
 	gc.SetStrokeColor(progressColor)
-	gc.SetFillColor(color.RGBA{255, 255, 255, 255})
+	gc.SetFillColor(white)
 	gc.SetLineWidth(strokeWidth)
 	gc.ArcTo(halfWidth, halfWidth, circleSize, circleSize, arcAngle, arcAngle)
 	gc.Close()
@@ -153,7 +156,6 @@ func generatePie(params PieParams) image.Image {
 func generateHorseshoe(params PieParams) image.Image {
 	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
 
-	gray := color.RGBA{247, 246, 245, 255}
 	progressColor := progressColors[params.color]
 	progressShadow := progressShadows[params.color]
 

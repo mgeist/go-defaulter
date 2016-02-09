@@ -13,6 +13,7 @@ import (
 )
 
 var templates = template.Must(template.ParseFiles("test.html"))
+var encoder = png.Encoder{png.BestSpeed}
 
 var progressColors = map[string]color.RGBA{
 	"green":  color.RGBA{130, 187, 65, 255},
@@ -162,21 +163,21 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	params := parseParams(r.URL.Query())
 	w.Header().Set("Content-Type", "image/png")
 	w.Header().Set("Cache-Control", "max-age=7200")
-	png.Encode(w, generateImage(params))
+	encoder.Encode(w, generateImage(params))
 }
 
 func pieHandler(w http.ResponseWriter, r *http.Request) {
 	params := parsePieParams(r.URL.Query())
 	w.Header().Set("Content-Type", "image/png")
 	w.Header().Set("Cache-Control", "max-age=7200")
-	png.Encode(w, generatePie(params))
+	encoder.Encode(w, generatePie(params))
 }
 
 func horseshoeHandler(w http.ResponseWriter, r *http.Request) {
 	params := parsePieParams(r.URL.Query())
 	w.Header().Set("Content-Type", "image/png")
 	w.Header().Set("Cache-Control", "max-age=7200")
-	png.Encode(w, generateHorseshoe(params))
+	encoder.Encode(w, generateHorseshoe(params))
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
