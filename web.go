@@ -20,6 +20,12 @@ var progressColors = map[string]color.RGBA{
 	"red":    color.RGBA{227, 112, 104, 255},
 }
 
+var progressShadows = map[string]color.RGBA{
+	"green":  color.RGBA{117, 157, 64, 255},
+	"yellow": color.RGBA{203, 186, 95, 255},
+	"red":    color.RGBA{197, 95, 94, 255},
+}
+
 type Params struct {
 	size   int
 	seed   int64
@@ -31,7 +37,7 @@ type Params struct {
 type PieParams struct {
 	size     int
 	progress int
-	color    color.RGBA
+	color    string
 }
 
 func parsePieParams(urlParams url.Values) PieParams {
@@ -65,11 +71,11 @@ func parsePieParams(urlParams url.Values) PieParams {
 		colorString = "green"
 	}
 
-	var progressColor color.RGBA
-	if c, ok := progressColors[colorString]; ok {
-		progressColor = c
+	var progressColor string
+	if _, ok := progressColors[colorString]; ok {
+		progressColor = colorString
 	} else {
-		progressColor = progressColors["green"]
+		progressColor = "green"
 	}
 
 	params := PieParams{
@@ -162,6 +168,11 @@ func pieHandler(w http.ResponseWriter, r *http.Request) {
 	png.Encode(w, generatePie(params))
 }
 
+func horseshoeHandler(w http.ResponseWriter, r *http.Request) {
+	params := parsePieParams(r.URL.Query())
+	png.Encode(w, generateHorseshoe(params))
+}
+
 func testHandler(w http.ResponseWriter, r *http.Request) {
 	var sizes []int
 	var ranges []int
@@ -190,6 +201,7 @@ func main() {
 
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/pie/", pieHandler)
+	http.HandleFunc("/horseshoe/", horseshoeHandler)
 	http.HandleFunc("/test", testHandler)
 	// TODO: set proper content headers instead of this
 	http.HandleFunc("/favicon.ico", http.NotFound)
