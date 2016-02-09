@@ -160,16 +160,22 @@ func getAddr() string {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	params := parseParams(r.URL.Query())
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "max-age=7200")
 	png.Encode(w, generateImage(params))
 }
 
 func pieHandler(w http.ResponseWriter, r *http.Request) {
 	params := parsePieParams(r.URL.Query())
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "max-age=7200")
 	png.Encode(w, generatePie(params))
 }
 
 func horseshoeHandler(w http.ResponseWriter, r *http.Request) {
 	params := parsePieParams(r.URL.Query())
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "max-age=7200")
 	png.Encode(w, generateHorseshoe(params))
 }
 
