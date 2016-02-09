@@ -123,6 +123,7 @@ func generateImage(params Params) image.Image {
 func generatePie(params PieParams) image.Image {
 	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
 
+	progressColor := progressColors[params.color]
 	halfWidth := float64(params.size / 2)
 	strokeWidth := math.Floor(halfWidth * 0.1)
 	circleSize := halfWidth * 0.94
@@ -130,7 +131,7 @@ func generatePie(params PieParams) image.Image {
 
 	gc := draw2dimg.NewGraphicContext(img)
 	gc.BeginPath()
-	gc.SetStrokeColor(params.color)
+	gc.SetStrokeColor(progressColor)
 	gc.SetFillColor(color.RGBA{255, 255, 255, 255})
 	gc.SetLineWidth(strokeWidth)
 	gc.ArcTo(halfWidth, halfWidth, circleSize, circleSize, arcAngle, arcAngle)
@@ -139,12 +140,50 @@ func generatePie(params PieParams) image.Image {
 
 	startAngle := 270 * (math.Pi / 180.0)
 	angle := (360 * (float64(params.progress) * 0.01)) * (math.Pi / 180.0)
-	gc.SetFillColor(params.color)
+	gc.SetFillColor(progressColor)
 	gc.BeginPath()
 	gc.MoveTo(halfWidth, halfWidth)
 	gc.ArcTo(halfWidth, halfWidth, circleSize, circleSize, startAngle, angle)
 	gc.Close()
 	gc.Fill()
+
+	return img
+}
+
+func generateHorseshoe(params PieParams) image.Image {
+	img := image.NewRGBA(image.Rect(0, 0, params.size, params.size))
+
+	gray := color.RGBA{247, 246, 245, 255}
+	progressColor := progressColors[params.color]
+	progressShadow := progressShadows[params.color]
+
+	halfWidth := float64(params.size / 2)
+	strokeWidth := float64(params.size) * 0.086
+	bigStrokeWidth := float64(params.size) * 0.1
+	circleSize := halfWidth * 0.71
+	bigCircleSize := float64(params.size) * 0.4
+	startAngle := 120 * (math.Pi / 180.0)
+	angle := (300 * (float64(100) * 0.01)) * (math.Pi / 180.0)
+
+	gc := draw2dimg.NewGraphicContext(img)
+	gc.BeginPath()
+	gc.SetStrokeColor(gray)
+	gc.SetLineWidth(strokeWidth)
+	gc.ArcTo(halfWidth, halfWidth, circleSize, circleSize, startAngle, angle)
+	gc.Stroke()
+
+	angle = (300 * (float64(params.progress) * 0.01)) * (math.Pi / 180.0)
+	gc.BeginPath()
+	gc.SetStrokeColor(progressShadow)
+	gc.SetLineWidth(strokeWidth)
+	gc.ArcTo(halfWidth, halfWidth, circleSize, circleSize, startAngle, angle)
+	gc.Stroke()
+
+	gc.BeginPath()
+	gc.SetStrokeColor(progressColor)
+	gc.SetLineWidth(bigStrokeWidth)
+	gc.ArcTo(halfWidth, halfWidth, bigCircleSize, bigCircleSize, startAngle, angle)
+	gc.Stroke()
 
 	return img
 }
